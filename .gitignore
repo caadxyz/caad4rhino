@@ -1,0 +1,8 @@
+/lib
+/samples
+/dev/tags
+/dev/test.py
+**/*.swp
+/rhinoPythonStubs
+/IronPythonStubs
+resource/**.3dm.rhl

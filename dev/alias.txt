@@ -1,0 +1,17 @@
+WW ! wall _Enter
+DL ! wall a _Enter
+
+L2W ! line2wall w _Enter
+
+WJ ! wall_join _Enter
+DJ ! wall_join w _Enter
+
+OP ! opening
+WIN ! opening t w
+DOO ! opening t d
+
+DIMJ ! dimjoin
+DIMS ! dimsplit
+ 
+
+

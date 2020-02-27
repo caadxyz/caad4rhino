@@ -3,6 +3,7 @@
 * verion 0.0.1  
 * Copyright (c) 2019-2020 mahaidong
 * Supported by ikuku.cn & caad.xyz 
+* [中文说明](./readme-cn.md)
 
 ![caad4rhino](./resource/images/caad4rhino-w.png)
 

@@ -55,25 +55,29 @@ class DoubleLine:
 
     # width: Type real, the width
     # p0,p1: Type Point3d
+    # type 0=middle, 1=right
     # return: DoubleLine
     @classmethod  
-    def MakeDoubleLine(cls,width, p0, p1):  
+    def MakeDoubleLine(cls,width, p0, p1, type = 0):  
         line = geo.Line( p0, p1)
         curveLine = geo.LineCurve(line)
 
         plane = rs.PlaneFromNormal( p0, (0,0,1),p1-p0 )
         halfWidth = width/2.0
-
-        offLine0 = curveLine.Offset( plane, halfWidth,
-                                     sc.doc.ModelAbsoluteTolerance, geo.CurveOffsetCornerStyle.None )
-        offLine1 = curveLine.Offset( plane, -halfWidth,
-                                     sc.doc.ModelAbsoluteTolerance, geo.CurveOffsetCornerStyle.None )
-        
-        # oldLayer = rs.CurrentLayer("wall"); 
-        # sc.doc.Objects.AddLine(offLine0[0].Line)
-        # rs.CurrentLayer(oldLayer); 
-
-        return  cls(offLine0[0].Line, offLine1[0].Line)
+        if type == 0:
+            offLine0 = curveLine.Offset( plane, halfWidth,
+                                        sc.doc.ModelAbsoluteTolerance, geo.CurveOffsetCornerStyle.None )
+            offLine1 = curveLine.Offset( plane, -halfWidth,
+                                        sc.doc.ModelAbsoluteTolerance, geo.CurveOffsetCornerStyle.None )
+            return  cls(offLine0[0].Line, offLine1[0].Line)
+        elif type == 1:
+            offLine0 = curveLine.Offset( plane, width,
+                                        sc.doc.ModelAbsoluteTolerance, geo.CurveOffsetCornerStyle.None )
+            return  cls(offLine0[0].Line, line )
+        elif type == 2:
+            offLine1 = curveLine.Offset( plane, -width,
+                                        sc.doc.ModelAbsoluteTolerance, geo.CurveOffsetCornerStyle.None )
+            return  cls( line, offLine1[0].Line )
 
     def __str__(self):
         return "isDoubleLine: %s\n direction: %s \nwidth: %d\nline0: %s \nline1: %s\
@@ -414,7 +418,7 @@ class DoubleLine:
 
     # sc.doc.Objects.FindByCrossingWindowRegion(viewport, (screen1, screen2, screen3), True, filter)
     @classmethod  
-    def DrawDoubleLines(cls, layer):
+    def DrawDoubleLines(cls, layer, offsetType):
         # startPoint
         gp = Rhino.Input.Custom.GetPoint()
         gp.SetCommandPrompt("Pick first point")
@@ -436,7 +440,7 @@ class DoubleLine:
                 return gp.CommandResult()
             point2 = gp.Point()
             if point2:
-                doubleLine = cls.MakeDoubleLine(config.DOUBLELINEWIDTH, point1, point2);
+                doubleLine = cls.MakeDoubleLine(config.DOUBLELINEWIDTH, point1, point2, offsetType)
                 if (line00 != None)  and (line01 != None) : 
                     line10, line11 = doubleLine.draw()
                     p0 = rs.LineLineIntersection(line00,line10) 

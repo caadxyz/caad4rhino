@@ -12,6 +12,16 @@ import scriptcontext as sc
 import caad.config as config
 import urllib2
 
+#################vector#####################
+#display a vector
+def drawVector(anchor, vector, text=None):
+    if text:
+        textDot = Rhino.Geometry.TextDot(text, anchor)
+        sc.doc.Objects.AddTextDot(textDot)
+    else:
+        sc.doc.Objects.AddTextDot( str(round(vector.X,4))+","+str(round(vector.Y,4))+","+str(round(vector.Z,4)), anchor)
+    sc.doc.Objects.AddLine( Rhino.Geometry.Line( anchor, vector ))
+
 ################lineType####################
 #adding a lineType to document
 def addLineType(lineTypeName):
@@ -97,3 +107,9 @@ def openUrl(url):
 
 
 
+"""
+    @staticmethod
+    def Local2utc(theLocalTime):
+        aTimeStruct = time.mktime(theLocalTime.timetuple())
+        return datetime.utcfromtimestamp(aTimeStruct)
+"""

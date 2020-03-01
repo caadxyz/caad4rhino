@@ -44,6 +44,10 @@ Caad4Rhino is a python package whose purpose is to provide computer aided archit
 ![opening](./resource/images/opening.gif)
 ![dim](./resource/images/dim.gif)
 
+**All commands**
+
+caad, wall, line2wall, wall_join, opening, dimsplit, dimjoin
+
 ### License
 
 You can redistribute it and/or modify it under the terms of the GNU Lesser General Public License version 3 as published by the Free Software Foundation.

@@ -23,6 +23,12 @@ def RunCommand( is_interactive ):
     widthOption = Rhino.Input.Custom.OptionDouble( config.DOUBLELINEWIDTH, 
             config.DOUBLELINEWIDTHLIMIT[0],config.DOUBLELINEWIDTHLIMIT[1] )
     wallOption = Rhino.Input.Custom.OptionToggle(True, "Off", "On")
+
+    # offset side options
+    sideValues = "middle", "right", "left"
+    sideIndex = config.DOUBLELINEOFFSETSIDETYPE
+    go.AddOptionList("Type", sideValues, sideIndex)
+
     go.AddOptionDouble("Width", widthOption)
     go.AddOptionToggle("Wall", wallOption)
 
@@ -32,6 +38,8 @@ def RunCommand( is_interactive ):
             print go.CommandResult()
             break 
         if get_rc==Rhino.Input.GetResult.Option:
+            sideIndex = go.Option().CurrentListOptionIndex
+            config.DOUBLELINEOFFSETSIDETYPE = sideIndex 
             continue
         break
     
@@ -41,9 +49,9 @@ def RunCommand( is_interactive ):
         if not rs.IsLayer("Wall"): 
             util.initCaadLayer("Wall")
         if isWall :
-            DoubleLine.DrawDoubleLines("wall")
+            DoubleLine.DrawDoubleLines( "wall", sideIndex )
         else:
-            DoubleLine.DrawDoubleLines(rs.CurrentLayer())
+            DoubleLine.DrawDoubleLines( rs.CurrentLayer(), sideIndex )
 
 
     sc.doc.Views.Redraw()

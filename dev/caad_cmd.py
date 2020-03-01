@@ -17,5 +17,11 @@ def RunCommand( is_interactive ):
     print "caad4rhino 0.0.1"
     util.openUrl("https://github.com/caadxyz/caad4rhino")
     
+    
+    
+    
+    
+if __name__ == "__main__":
+  RunCommand(True)
 
 

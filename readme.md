@@ -35,7 +35,7 @@ Caad4Rhino is a python package whose purpose is to provide computer aided archit
 * open Rhino software then type command `caad` for help
 * you can find all commands in `dev/alias.txt`, you also can import this alias file to Rhino. 
 
->Note: Sometimes, Rhino requires that Python be loaded before it can see the new command for the first time in a session - running EditPythonScript, or any other python script should allow the command to work. 
+>Note: Sometimes, Rhino requires that Python be loaded before it can see the new command for the first time in a session - running EditPythonScript, or any other python script should allow the command to work.  [Tutorial about how to setup env](./HowToSetupENV.md)
 
 ### How to use?
 

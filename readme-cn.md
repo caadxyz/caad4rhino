@@ -34,7 +34,8 @@ Caad4Rhino 是一个在[rhino三维软件](https://www.rhino3d.com)下用于计�
 * 打开Rhino软件, 在命令行下输入`caad` 会打开帮助页.
 * 在 `dev/alias.txt` 文件中你可以找到所有的命令,你也可以把这些快捷键导入到Rhino的快捷键环境中.  
 
->Note: Sometimes, Rhino requires that Python be loaded before it can see the new command for the first time in a session - running EditPythonScript, or any other python script should allow the command to work. 
+>Note: Sometimes, Rhino requires that Python be loaded before it can see the new command for the first time in a session - running EditPythonScript, or any other python script should allow the command to work.  [Tutorial about how to setup env](./HowToSetupENV-cn.md)
+ 
 
 ### 如何使用?
 

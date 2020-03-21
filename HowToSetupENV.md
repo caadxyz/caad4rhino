@@ -33,7 +33,7 @@ You can solve it in the following ways:
 * Click on the menu Tools-> PythonScript-> Edit
 * Click menu File-> Open, open `Helloworld_cmd.py`
 * Click the save as button to see the folder location: `%AppData%\McNeel\Rhinoceros\6.0\Plug-ins\PythonPlugins\Helloworld{058e2284-c977-4a3a-a188-d2f62ac95e66}`
-* Install `caad4rhino{417c9034-2152-48dc-b487-29b584c473a5}` under the same folder `%AppData%\McNeel\Rhinoceros\6.0\ Plug-ins\PythonPlugins` 
+* Create folder `caad4rhino{417c9034-2152-48dc-b487-29b584c473a5}` under the same folder `%AppData%\McNeel\Rhinoceros\6.0\ Plug-ins\PythonPlugins`, then copy `dev` folder from where you download to `caad4rhino{417c9034-2152-48dc-b487-29b584c473a5}`. 
 * Close rhino and restart
 
 If you can run the `Helloworld` command this time, you should also be able to run the `caad` command

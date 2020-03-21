@@ -2,8 +2,10 @@
 /samples
 /dev/tags
 /dev/test.py
+dev/rhinoTest.py
 **/*.swp
 /rhinoPythonStubs
 /IronPythonStubs
 resource/**.3dm.rhl
 /.vscode
+**/*.orig

@@ -12,6 +12,9 @@ import scriptcontext as sc
 import caad.config as config
 import urllib2
 
+
+
+
 #################vector#####################
 #display a vector
 def drawVector(anchor, vector, text=None):

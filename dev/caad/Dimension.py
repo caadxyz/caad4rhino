@@ -12,6 +12,50 @@ import scriptcontext as sc
 import caad.config as config
 import caad.utility as util
 
+
+def GetFrameSize(size):
+    # get the width and height by the size of layout
+    width = config.A5FRAMEWIDTH
+    height = config.A5FRAMEHEIGHT
+    if len(size) !=2 :
+        return None
+    elif size[0] != 'A':
+        return None
+    else:
+        size = int(size[1])
+        i = 5
+        while i != size:
+            i -=1
+            oldWidth = width
+            width = height*2
+            height = oldWidth
+    return (width, height)
+
+def DrawFrameBySize(size,location, rightMargin, leftMargin ):
+    width, height = GetFrameSize(size)
+    # draw layout frame
+    width = width/config.DRAWINGSCALE
+    height = height/config.DRAWINGSCALE
+    rightMargin = rightMargin/config.DRAWINGSCALE
+    leftMargin = leftMargin/config.DRAWINGSCALE
+
+    p0 = rs.PointAdd((0,0,0),location)
+    p1 = rs.PointAdd((width,0,0),location)
+    p2 = rs.PointAdd((width,height,0),location)
+    p3 = rs.PointAdd((0,height,0),location)
+    outPolyline = rs.AddPolyline([p0,p1,p2,p3,p0])
+
+    p0 = rs.PointAdd((leftMargin,rightMargin,0),location)
+    p1 = rs.PointAdd((width-rightMargin,rightMargin,0),location)
+    p2 = rs.PointAdd((width-rightMargin,height-rightMargin,0),location)
+    p3 = rs.PointAdd((leftMargin,height-rightMargin,0),location)
+    inPolyline = rs.AddPolyline([p0,p1,p2,p3,p0])
+    return ( outPolyline, inPolyline)
+
+
+def ChangeDrawingScale():
+    pass
+
 def DimSplit(object_id):
     annotation_object = sc.doc.Objects.Find(object_id )
     dim = annotation_object.Geometry

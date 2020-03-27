@@ -128,7 +128,6 @@ def RunCommand( is_interactive ):
         blockIndex = go.Option().CurrentListOptionIndex
         config.OPENINGTYPE = blockIndex 
     
-
     # distance and length
     go = Rhino.Input.Custom.GetOption()
     go.AcceptNothing(True)

@@ -2,6 +2,7 @@
 /samples
 /dev/tags
 /dev/test.py
+dev/rhinoTest.py
 **/*.swp
 /rhinoPythonStubs
 /IronPythonStubs

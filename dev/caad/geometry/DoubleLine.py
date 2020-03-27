@@ -16,11 +16,9 @@ import scriptcontext as sc
 
 import caad.config  as config
 
-
 class DoubleLine:
-    # initialized by two Rhino.Geometry.Line
     def __init__(self, line0, line1):
-        
+        # initialized by two Rhino.Geometry.Line
         self.isDoubleLine = True
         self.direction = None
         self.line0 = None
@@ -52,13 +50,16 @@ class DoubleLine:
                     self.line0=line0
                     self.line1=line1
    
-
-    # width: Type real, the width
-    # p0,p1: Type Point3d
-    # type 0=middle, 1=right
-    # return: DoubleLine
     @classmethod  
     def MakeDoubleLine(cls,width, p0, p1, type = 0):  
+        """Make a doubleLine by width and two points 
+        Parameters:
+            width: Type real, the width
+            p0,p1: Type Point3d
+            type 0=middle, 1=right, 2=left
+        returns: DoubleLine
+        """
+
         line = geo.Line( p0, p1)
         curveLine = geo.LineCurve(line)
 
@@ -83,21 +84,22 @@ class DoubleLine:
         return "isDoubleLine: %s\n direction: %s \nwidth: %d\nline0: %s \nline1: %s\
         " %(self.isDoubleLine, self.direction, self.width, self.line0, self.line1)
 
-    # flip this doubleLine's direction
     def flip(self):
+        # flip this doubleLine's direction
         self.line0.Flip()
         self.line1.Flip()
         self.direction.Reverse()
 
-
-
-    # side=0 start from startPoint , side=1 start from endPoint 
-    # direct:
-    #  0 | 1
-    # -------
-    #  2 | 3
-    # block 0=empty 1=window 2=door
     def drawOpening(self, distance,length, side=0, block=0, direct=0):
+        """
+        side=0 start from startPoint , side=1 start from endPoint 
+        direct:
+          0 | 1
+         -------
+          2 | 3
+        block 0=empty 1=window 2=door
+        """
+
         localDirect = direct
         if side == 1:
             self.flip()
@@ -175,12 +177,16 @@ class DoubleLine:
 
 
     ##########IntersectionWithDoubleLine start####################
-    # lineList: Type list of Rhino.Geometry.Line
-    # return: 
-    #   boolean
-    #   two intersected DoubleLine
     @classmethod
     def GetIntersectedDoubleline(cls,lineList):
+        """
+        Parameters:
+            lineList: Type list of Rhino.Geometry.Line
+        Returns: 
+           boolean
+           two intersected DoubleLine
+        """
+
         doubleLineList=[]
         if len(lineList) ==4:
             for i in range(0,4):
@@ -199,24 +205,23 @@ class DoubleLine:
         return (False, None)
 
 
-    # get all parameters from  selfDoubleLine and antherDoubleLine
-    '''
-    a=selfDoubleLine Type: System.Double
-    Parameter on self.line0 that is closest to doubeLine.line0. 
-    ab > 1 : means outside of self.line0.To
-    ab < 0 : means outside of self.line0.From
-    0 <=ab<= 1 : means inside of self.line0
-
-    b=anotherDoubleLine Type: System.Double
-    Parameter on doubleLine.line0 that is closest to self.line0. 
-    ba > 1 : means outside of doubleLine.line0.To
-    ba < 0 : means outside of doubleLine.line0.From
-    0<= ba <= 1 : means inside of doubleLine.line0
-
-    angle Type: System.Double
-    counterclockwise angle between self and another
-    '''
     def drawIntersectionWithDoubleLine(self, doubleLine):
+        """draw two doubleLines:  selfDoubleLine and antherDoubleLine
+        a=selfDoubleLine Type: System.Double
+        Parameter on self.line0 that is closest to doubeLine.line0. 
+        ab > 1 : means outside of self.line0.To
+        ab < 0 : means outside of self.line0.From
+        0 <=ab<= 1 : means inside of self.line0
+
+        b=anotherDoubleLine Type: System.Double
+        Parameter on doubleLine.line0 that is closest to self.line0. 
+        ba > 1 : means outside of doubleLine.line0.To
+        ba < 0 : means outside of doubleLine.line0.From
+        0<= ba <= 1 : means inside of doubleLine.line0
+
+        angle Type: System.Double
+        counterclockwise angle between self and another
+        """
         #get intersection infomation between two doubleLines
         rc, a0b0, b0a0 = geo.Intersect.Intersection.LineLine(self.line0, doubleLine.line0)
         if not rc:
@@ -228,14 +233,13 @@ class DoubleLine:
 
         # self.direction, doubleLine.direction
         angle =  rs.Angle((0,0,0), rs.VectorRotate(doubleLine.direction, -rs.Angle((0,0,0), self.direction)[0], (0,0,1)) )
-
-        selfRawParameter       = ((a0b0, a0b1, a1b0, a1b1, b0a0, b1a0, b0a1, b1a1),  -angle[0])
+        selfRawParameter    = ((a0b0, a0b1, a1b0, a1b1, b0a0, b1a0, b0a1, b1a1),  -angle[0])
         anotherRawParameter = ((b0a0, b0a1, b1a0, b1a1, a0b0, a1b0, a0b1, a1b1), angle[0])
 
         # ----self-doubleLine-a----
-        selfParam = self.getDoubleLineParameterByIntersection(selfRawParameter)
+        selfParam = self._getDoubleLineParameterByIntersection(selfRawParameter)
         # ----another-doubleLine-b---
-        anotherParam = doubleLine.getDoubleLineParameterByIntersection(anotherRawParameter)
+        anotherParam = doubleLine._getDoubleLineParameterByIntersection(anotherRawParameter)
 
         # ----draw self-doubleLine-a----
         self.drawDoubleLineByparameterList( selfParam[0], selfParam[1] )
@@ -244,7 +248,7 @@ class DoubleLine:
 
 
     #modify this doubleLine with parameter
-    def getDoubleLineParameterByIntersection(self, parameter):
+    def _getDoubleLineParameterByIntersection(self, parameter):
 
         (a0b0, a0b1, a1b0, a1b1, b0a0, b1a0, b0a1, b1a1), angle = parameter
         #初始化a0, a1的参数数组 
@@ -349,60 +353,16 @@ class DoubleLine:
 
     ##########IntersectionWithDoubleLine end######################
 
-
-    ####################doublelines start#########################
-    # ikuku-todo
-    #  |    |    |
-    # ---------------self----
-    #  |    |    | 
-    # sort doubleLineList by the intersection parameter  with self.line0.From
-    # return selfParameterList,sortedDoubleLineListAndParameter 
-    def sortDoubleLines(self, doubleLineList):
-        selfParameterList = []
-        sortedDoubleLineList = []
-        parameter = {}
-        for i in range(len(doubleLineList)):
-            rc, a, b, angle = self.IntersectionWithDoubleLine(doubleLineList[i])
-            if rc:
-                parameter[i]=a
-        sortedParameter = sorted(parameter.iteritems(), key=lambda d:d[1], reverse = False)
-
-        for k, v in sortedParameter():
-            sortedDoubleLineList.append(doubleLineList[k])
-
-        return (selfParameterList,sortedDoubleLineList)
-
-    # ikuku-todo
-    #  |    |    |
-    # ---------------self----
-    #  |    |    | 
-    # draw self and doubleLineList
-    def intersectionWithDoubleLines(self,doubleLineList):
-        # sort doubleLine list  by distance to this line.
-        # drawDoubleLineByParameterList
-        for doubleLine in doubleLineList:
-            # drawDoubleLineByParameter
-            pass
-
-    # ikuku-todo
-    #return doubLineList from lineList
-    @staticmethod
-    def GetDoubleLineList(lineList):
-        doubleLineList = []
-        pass
-        return doubleLineList
-    ####################doublelines end#########################
-
-
-    # draw this doubleLine in sc.doc
+   
     def draw(self):
+        # draw this doubleLine in sc.doc
         line0Id = sc.doc.Objects.AddLine(self.line0)
         line1Id = sc.doc.Objects.AddLine(self.line1)
         return (line0Id,line1Id)
 
-    # draw line segments to current doc.
     @staticmethod
-    def DrawLineByParameter(line, parameterList):
+    def _DrawLineByParameter(line, parameterList):
+        # draw line segments to current doc.
         for i in range(len(parameterList)): 
             if i%2 == 0:
                 sc.doc.Objects.AddLine( line.PointAt(parameterList[i]), line.PointAt(parameterList[i+1]) )
@@ -413,8 +373,8 @@ class DoubleLine:
             paramList0: the paramerter list from  self.line0
             paramList1: the paramerter list from  self.line1
         """
-        self.DrawLineByParameter(self.line0, paramList0)
-        self.DrawLineByParameter(self.line1, paramList1)
+        self._DrawLineByParameter(self.line0, paramList0)
+        self._DrawLineByParameter(self.line1, paramList1)
 
     # sc.doc.Objects.FindByCrossingWindowRegion(viewport, (screen1, screen2, screen3), True, filter)
     @classmethod  

@@ -386,11 +386,14 @@ class DoubleLine:
         if gp.CommandResult()!=Rhino.Commands.Result.Success:
             return gp.CommandResult()
         point1 = gp.Point()
+        gp.Dispose()
+
+        # secondPoint
         line00 = None
         line01 = None
-        # secondPoint
         oldLayer = rs.CurrentLayer(layer)
         while True:
+            gp = Rhino.Input.Custom.GetPoint()
             gp.SetCommandPrompt("Pick second point")
             gp.DrawLineFromPoint(point1,True)
             gp.EnableDrawLineFromPoint(True)
@@ -420,8 +423,7 @@ class DoubleLine:
             else:
                 sc.errorhandler()
                 break
+            gp.Dispose()
 
         rs.CurrentLayer(oldLayer)
-        gp.Dispose()
-
         

@@ -3,7 +3,6 @@ import unittest
 import sys
 sys.path.insert(0,'..')
 
-
 import scriptcontext as sc
 import caad
 from datetime import datetime
@@ -17,3 +16,12 @@ class TestCase01(unittest.TestCase):
         localDatetime = datetime(2019,6,22,12)
         position =  beijing.getSunPositionByLocaltime( localDatetime )
         sun = Sun(localDatetime,position['altitude'], position['azimuth'] )
+
+        """
+        myTest = SunPosition()
+        localtime = datetime(2019,6,22,9)
+        position =  myTest.calculateSunPositionWithGMT( localtime,8, 39.9, 116.3 )
+        print position['altitude']*180/math.pi
+        print position['azimuth']*180/math.pi
+        """
+

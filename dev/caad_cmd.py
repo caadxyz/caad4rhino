@@ -6,12 +6,13 @@ create on 2020.02.19
 
 description:
 '''
-
+import System
 import Rhino
 import rhinoscriptsyntax as rs
 import scriptcontext as sc
 import caad.config as config
 import caad.utility as util
+import caad.Dimension as Dim
 
 __commandname__ = "Caad"
 def RunCommand( is_interactive ):
@@ -26,6 +27,14 @@ def RunCommand( is_interactive ):
     scaleOption = Rhino.Input.Custom.OptionDouble( config.DRAWINGSCALE )
     go.AddOptionDouble("DrawingScale", scaleOption)
 
+    arrowValues = []
+    for arrow in System.Enum.GetNames(Rhino.DocObjects.DimensionStyle.ArrowType):
+        if (arrow != 'None') and (arrow != 'UserBlock'):
+            arrowValues.append(arrow)
+    arrowValue = config.DIMARROWHEAD
+    arrowIndex = arrowValues.index(arrowValue)
+    opList = go.AddOptionList("DimArrowHead", arrowValues, arrowIndex)
+
     aliasOption = Rhino.Input.Custom.OptionToggle( config.IMPORTCOMMANDALIAS, "Off", "On")
     go.AddOptionToggle("ImportCommandAlias", aliasOption)
 
@@ -39,15 +48,24 @@ def RunCommand( is_interactive ):
         if get_rc==Rhino.Input.GetResult.Option: 
             isHomePage = homePageOption.CurrentValue
             if isHomePage : util.openUrl( config.HOMEPAGE  )
+
+            if go.OptionIndex() == opList:
+                arrowIndex = go.Option().CurrentListOptionIndex
+                arrowValue = arrowValues[arrowIndex]
+                config.DIMARROWHEAD = arrowValue
+                Dim.ChangeCaadDimArrowHead(arrowValue)
             continue
 
         break
      
     if go.CommandResult() != Rhino.Commands.Result.Cancel:
         config.DRAWINGSCALE  = scaleOption.CurrentValue
-        print (config.DRAWINGSCALE)
+        Dim.ChangeDrawingScale(config.DRAWINGSCALE)
+        print ("current drawwing scale = 1:"+str(int(1/config.DRAWINGSCALE)))
         isImportedAlias = aliasOption.CurrentValue
-        if isImportedAlias : config.importCaadAlias()
+        if isImportedAlias : 
+            config.importCaadAlias()
+            print ("caad4rhino command aliases imported")
 
 if __name__ == "__main__":
     RunCommand(True)

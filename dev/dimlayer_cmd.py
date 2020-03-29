@@ -8,6 +8,7 @@ description:
 '''
 import Rhino
 import rhinoscriptsyntax as rs
+import caad.utility as util
 
 __commandname__ = "DimLayer"
 def RunCommand( is_interactive ):

@@ -27,6 +27,9 @@ A5FRAMEHEIGHT = 148.5
 FRAMESIZE = "A3"
 FRAMELEFTMARGIN = 20.0
 FRAMERIGHTMARGIN = 10.0
+# dimension's arrow head: SolidTriangle Dot Tick ShortTriangle OpenArrow Rectangle LongTriangle LongerTriangle
+DIMARROWHEAD = "Tick"
+
 
 IMPORTCOMMANDALIAS = False
 import rhinoscriptsyntax as rs

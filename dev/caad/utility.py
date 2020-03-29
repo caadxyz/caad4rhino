@@ -12,9 +12,6 @@ import scriptcontext as sc
 import caad.config as config
 import urllib2
 
-
-
-
 #################vector#####################
 #display a vector
 def drawVector(anchor, vector, text=None):
@@ -24,6 +21,7 @@ def drawVector(anchor, vector, text=None):
     else:
         sc.doc.Objects.AddTextDot( str(round(vector.X,4))+","+str(round(vector.Y,4))+","+str(round(vector.Z,4)), anchor)
     sc.doc.Objects.AddLine( Rhino.Geometry.Line( anchor, vector ))
+    
 
 ################lineType####################
 #adding a lineType to document
@@ -41,6 +39,27 @@ def editLineTypePattern(lineTypeName, pattern):
         else: lineType.AppendSegment(segment, True)
     lineType.RemoveSegment(0)
     lineType.CommitChanges()
+
+################DimensionStyle############
+def initCaadDimensionStyle(theScale = None):
+    ds = sc.doc.DimStyles.FindName("caad")
+    if ds is not None :
+        return
+    else:
+        caadDim = Rhino.DocObjects.DimensionStyle()
+        defaultDim = sc.doc.DimStyles.FindName("Default")
+        caadDim.CopyFrom(defaultDim)
+
+        if theScale is None:
+            caadDim.DimensionScale = 1/config.DRAWINGSCALE
+        else:
+            caadDim.DimensionScale = 1/theScale
+
+        caadDim.ArrowType1 =  System.Enum.Parse(Rhino.DocObjects.DimensionStyle.ArrowType, config.DIMARROWHEAD)
+        caadDim.ArrowType2 =  System.Enum.Parse(Rhino.DocObjects.DimensionStyle.ArrowType, config.DIMARROWHEAD)
+        index = sc.doc.DimStyles.Add("caad")
+        sc.doc.DimStyles.Modify(caadDim, index, False)
+        sc.doc.DimStyles.SetCurrent(index, False) 
 
 ################layer#####################
 def initCaadLayer(name):
@@ -111,8 +130,7 @@ def openUrl(url):
 
 
 """
-    @staticmethod
-    def Local2utc(theLocalTime):
-        aTimeStruct = time.mktime(theLocalTime.timetuple())
-        return datetime.utcfromtimestamp(aTimeStruct)
+def Local2utc(theLocalTime):
+    aTimeStruct = time.mktime(theLocalTime.timetuple())
+    return datetime.utcfromtimestamp(aTimeStruct)
 """

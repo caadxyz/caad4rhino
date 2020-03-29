@@ -5,13 +5,13 @@ create on 2020.02.13
 @author mahaidong
 description:
 '''
+import System
 import Rhino
 import Rhino.Geometry as geo
 import rhinoscriptsyntax as rs
 import scriptcontext as sc
 import caad.config as config
 import caad.utility as util
-
 
 def GetFrameSize(size):
     # get the width and height by the size of layout
@@ -44,7 +44,6 @@ def DrawFrameBySize(size,location, rightMargin, leftMargin ):
     p2 = rs.PointAdd((width,height,0),location)
     p3 = rs.PointAdd((0,height,0),location)
     outPolyline = rs.AddPolyline([p0,p1,p2,p3,p0])
-
     p0 = rs.PointAdd((leftMargin,rightMargin,0),location)
     p1 = rs.PointAdd((width-rightMargin,rightMargin,0),location)
     p2 = rs.PointAdd((width-rightMargin,height-rightMargin,0),location)
@@ -53,8 +52,28 @@ def DrawFrameBySize(size,location, rightMargin, leftMargin ):
     return ( outPolyline, inPolyline)
 
 
-def ChangeDrawingScale():
-    pass
+def ChangeDrawingScale(theScale):
+    sc.doc.Linetypes.LinetypeScale = 1/theScale
+    ds = sc.doc.DimStyles.FindName("caad")
+    if ds is None :
+        util.initCaadDimensionStyle(theScale)
+    else:
+        ds.DimensionScale = 1/theScale
+        sc.doc.DimStyles.Modify(ds, ds.Index, False)
+        sc.doc.DimStyles.SetCurrent(ds.Index, False) 
+
+def ChangeCaadDimArrowHead( arrowHead ):
+    """
+    Parameters:
+        arrowHead(str): SolidTriangle Dot Tick ShortTriangle OpenArrow Rectangle LongTriangle LongerTriangle
+    """
+    ds = sc.doc.DimStyles.FindName("caad")
+    if ds is None :
+        util.initCaadDimensionStyle(config.DRAWINGSCALE)
+    else:
+        ds.ArrowType1 =  System.Enum.Parse(Rhino.DocObjects.DimensionStyle.ArrowType, arrowHead )
+        ds.ArrowType2 =  System.Enum.Parse(Rhino.DocObjects.DimensionStyle.ArrowType, arrowHead )
+        sc.doc.DimStyles.Modify(ds, ds.Index, False)
 
 def DimSplit(object_id):
     annotation_object = sc.doc.Objects.Find(object_id )

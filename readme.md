@@ -23,7 +23,8 @@ Caad4Rhino is a python package whose purpose is to provide computer aided archit
 * dimension
     * split a dimension-line
     * join two dimension-lines
-    * layout frame (A5,A4,A3,A2,A1,A0) and drawing scale
+    * layout frame (A5,A4,A3,A2,A1,A0) 
+    * drawing scale (linetype, dimension style)
 
 ### How to install?
 
@@ -48,7 +49,7 @@ Caad4Rhino is a python package whose purpose is to provide computer aided archit
 ### All Commands
 
 * caad ->caad4rhino setting up
-    * drawing scale
+    * drawing scale (linetype, dimension style)
     * importing command aliases 
     * and this help document
 * wall -> draw walls

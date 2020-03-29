@@ -1,6 +1,7 @@
 /lib
 /samples
 /dev/tags
+/dev/lib
 /dev/test.py
 dev/rhinoTest.py
 **/*.swp

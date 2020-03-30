@@ -25,7 +25,7 @@ def RunCommand( is_interactive ):
     go.SetCommandPrompt( "caad4rhino setting" )
 
     scaleOption = Rhino.Input.Custom.OptionDouble( config.DRAWINGSCALE )
-    go.AddOptionDouble("DrawingScale", scaleOption)
+    scaleOpIndex, scaleOpValue = go.AddOptionDouble("DrawingScale", scaleOption)
 
     arrowValues = []
     for arrow in System.Enum.GetNames(Rhino.DocObjects.DimensionStyle.ArrowType):
@@ -33,7 +33,7 @@ def RunCommand( is_interactive ):
             arrowValues.append(arrow)
     arrowValue = config.DIMARROWHEAD
     arrowIndex = arrowValues.index(arrowValue)
-    opList = go.AddOptionList("DimArrowHead", arrowValues, arrowIndex)
+    arrowOpList = go.AddOptionList("DimArrowHead", arrowValues, arrowIndex)
 
     aliasOption = Rhino.Input.Custom.OptionToggle( config.IMPORTCOMMANDALIAS, "Off", "On")
     go.AddOptionToggle("ImportCommandAlias", aliasOption)
@@ -48,20 +48,25 @@ def RunCommand( is_interactive ):
         if get_rc==Rhino.Input.GetResult.Option: 
             isHomePage = homePageOption.CurrentValue
             if isHomePage : util.openUrl( config.HOMEPAGE  )
-
-            if go.OptionIndex() == opList:
+            if go.OptionIndex() == scaleOpIndex:
+                if  scaleOption.CurrentValue  in config.DRAWINGSCALEList:
+                    config.DRAWINGSCALE  = scaleOption.CurrentValue
+                else:
+                    print ( "The scale is not working." )
+                    print ( "It should be in " + " ,".join([str(elem) for elem in config.DRAWINGSCALEList]) + "." )
+                    scaleOpValue.CurrentValue = config.DRAWINGSCALE
+            elif go.OptionIndex() == arrowOpList:
                 arrowIndex = go.Option().CurrentListOptionIndex
                 arrowValue = arrowValues[arrowIndex]
                 config.DIMARROWHEAD = arrowValue
-                Dim.ChangeCaadDimArrowHead(arrowValue)
             continue
-
         break
      
     if go.CommandResult() != Rhino.Commands.Result.Cancel:
-        config.DRAWINGSCALE  = scaleOption.CurrentValue
         Dim.ChangeDrawingScale(config.DRAWINGSCALE)
-        print ("current drawwing scale = 1:"+str(int(1/config.DRAWINGSCALE)))
+        print ("current drawwing scale = 1:"+str(int(config.DRAWINGSCALE)))
+        Dim.ChangeCaadDimArrowHead( config.DIMARROWHEAD )
+        print ( "current dimension arrowhead: "+ config.DIMARROWHEAD )
         isImportedAlias = aliasOption.CurrentValue
         if isImportedAlias : 
             config.importCaadAlias()

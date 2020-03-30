@@ -17,9 +17,9 @@ def GetPointDynamicDrawFunc( sender, args ):
   (width, height) = Dim.GetFrameSize( config.FRAMESIZE )
   points= []
   points.append( args.CurrentPoint )
-  points.append( args.CurrentPoint + Rhino.Geometry.Point3d( width/config.DRAWINGSCALE,0,0) )
-  points.append( args.CurrentPoint + Rhino.Geometry.Point3d( width/config.DRAWINGSCALE,height/config.DRAWINGSCALE,0) )
-  points.append( args.CurrentPoint + Rhino.Geometry.Point3d( 0,height/config.DRAWINGSCALE,0) )
+  points.append( args.CurrentPoint + Rhino.Geometry.Point3d( width*config.DRAWINGSCALE,0,0) )
+  points.append( args.CurrentPoint + Rhino.Geometry.Point3d( width*config.DRAWINGSCALE,height*config.DRAWINGSCALE,0) )
+  points.append( args.CurrentPoint + Rhino.Geometry.Point3d( 0,height*config.DRAWINGSCALE,0) )
   points.append( args.CurrentPoint )
   args.Display.DrawPolyline( points, System.Drawing.Color.Cyan )
 
@@ -27,7 +27,7 @@ __commandname__ = "Frame"
 def RunCommand( is_interactive ):
 
     gp = Rhino.Input.Custom.GetPoint()
-    gp.SetCommandPrompt( "get a point as a locaiton and setting frame size, scale 1:"+str( int(1/config.DRAWINGSCALE)) )
+    gp.SetCommandPrompt( "get a point as a locaiton and setting frame size, scale 1:"+str( config.DRAWINGSCALE) )
     sizeValues = "A5", "A4", "A3","A2","A1","A0"
     sizeValue = config.FRAMESIZE
     sizeIndex = sizeValues.index(sizeValue)

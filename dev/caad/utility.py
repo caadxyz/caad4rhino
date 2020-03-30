@@ -42,7 +42,9 @@ def editLineTypePattern(lineTypeName, pattern):
 
 ################DimensionStyle############
 def initCaadDimensionStyle(theScale = None):
-    ds = sc.doc.DimStyles.FindName("caad")
+    layerName = "dim"+str(int(theScale))
+    ds = sc.doc.DimStyles.FindName(layerName)
+
     if ds is not None :
         return
     else:
@@ -51,13 +53,16 @@ def initCaadDimensionStyle(theScale = None):
         caadDim.CopyFrom(defaultDim)
 
         if theScale is None:
-            caadDim.DimensionScale = 1/config.DRAWINGSCALE
+            caadDim.DimensionScale = config.DRAWINGSCALE
         else:
-            caadDim.DimensionScale = 1/theScale
+            caadDim.DimensionScale = theScale
 
         caadDim.ArrowType1 =  System.Enum.Parse(Rhino.DocObjects.DimensionStyle.ArrowType, config.DIMARROWHEAD)
         caadDim.ArrowType2 =  System.Enum.Parse(Rhino.DocObjects.DimensionStyle.ArrowType, config.DIMARROWHEAD)
-        index = sc.doc.DimStyles.Add("caad")
+        caadDim.ArrowLength = config.DIMARROWSIZE
+        caadDim.TextHeight = config.DIMTEXTHEIGHT
+
+        index = sc.doc.DimStyles.Add(layerName)
         sc.doc.DimStyles.Modify(caadDim, index, False)
         sc.doc.DimStyles.SetCurrent(index, False) 
 

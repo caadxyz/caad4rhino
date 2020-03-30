@@ -45,6 +45,8 @@ Caad4Rhino is a python package whose purpose is to provide computer aided archit
 ![line2wall](./resource/images/line2wall.gif)
 ![opening](./resource/images/opening.gif)
 ![dim](./resource/images/dim.gif)
+![dimscale](./resource/images/dimscale.gif)
+![frame](./resource/images/frame.gif)
 
 ### All Commands
 

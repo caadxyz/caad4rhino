@@ -3,6 +3,8 @@
 Copyright
 create on 2019.09.05
 @author mahaidong
+description:
+This is a setting file for Caad4Rhino.
 '''
 
 SHOWHOMEPAGE = False
@@ -20,16 +22,19 @@ OPENINGLENGTH   = 1000
 WINDOWLENGTH    = 1200
 DOORLENGTH      = 900
 
-# DRAWINGSCALE  1:100
-DRAWINGSCALE = 0.01
+# DRAWINGSCALE  1/100
+DRAWINGSCALE = 100
+DRAWINGSCALEList = 5,20,50,100,200,250,300,500,1000
 A5FRAMEWIDTH = 210.0
 A5FRAMEHEIGHT = 148.5
 FRAMESIZE = "A3"
 FRAMELEFTMARGIN = 20.0
 FRAMERIGHTMARGIN = 10.0
-# dimension's arrow head: SolidTriangle Dot Tick ShortTriangle OpenArrow Rectangle LongTriangle LongerTriangle
-DIMARROWHEAD = "Tick"
-
+# dimension's arrow head: 
+# SolidTriangle Dot Tick ShortTriangle OpenArrow Rectangle LongTriangle LongerTriangle
+DIMARROWHEAD  = "Tick"
+DIMARROWSIZE  = 1.5
+DIMTEXTHEIGHT = 1.5
 
 IMPORTCOMMANDALIAS = False
 import rhinoscriptsyntax as rs
@@ -40,12 +45,10 @@ def importCaadAlias():
     rs.AddAlias("L2W", "! line2wall w _Enter")
     rs.AddAlias("WJ",  "! wall_join _Enter")
     rs.AddAlias("DJ",  "! wall_join w _Enter")
-
     #opening
     rs.AddAlias("OP",   "! opening")
     rs.AddAlias("WIN",  "! opening t w")
     rs.AddAlias("DOOR",  "! opening t d")
-
     #dim
     rs.AddAlias("DIMJ",  "! dimjoin")
     rs.AddAlias("DIMS",  "! dimsplit")

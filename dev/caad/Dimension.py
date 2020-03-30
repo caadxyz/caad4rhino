@@ -34,10 +34,10 @@ def GetFrameSize(size):
 def DrawFrameBySize(size,location, rightMargin, leftMargin ):
     width, height = GetFrameSize(size)
     # draw layout frame
-    width = width/config.DRAWINGSCALE
-    height = height/config.DRAWINGSCALE
-    rightMargin = rightMargin/config.DRAWINGSCALE
-    leftMargin = leftMargin/config.DRAWINGSCALE
+    width = width*config.DRAWINGSCALE
+    height = height*config.DRAWINGSCALE
+    rightMargin = rightMargin*config.DRAWINGSCALE
+    leftMargin = leftMargin*config.DRAWINGSCALE
 
     p0 = rs.PointAdd((0,0,0),location)
     p1 = rs.PointAdd((width,0,0),location)
@@ -53,12 +53,13 @@ def DrawFrameBySize(size,location, rightMargin, leftMargin ):
 
 
 def ChangeDrawingScale(theScale):
-    sc.doc.Linetypes.LinetypeScale = 1/theScale
-    ds = sc.doc.DimStyles.FindName("caad")
+    sc.doc.Linetypes.LinetypeScale = theScale
+    layerName = "dim"+str(int(theScale))
+    ds = sc.doc.DimStyles.FindName(layerName)
     if ds is None :
         util.initCaadDimensionStyle(theScale)
     else:
-        ds.DimensionScale = 1/theScale
+        ds.DimensionScale = theScale
         sc.doc.DimStyles.Modify(ds, ds.Index, False)
         sc.doc.DimStyles.SetCurrent(ds.Index, False) 
 
@@ -67,13 +68,11 @@ def ChangeCaadDimArrowHead( arrowHead ):
     Parameters:
         arrowHead(str): SolidTriangle Dot Tick ShortTriangle OpenArrow Rectangle LongTriangle LongerTriangle
     """
-    ds = sc.doc.DimStyles.FindName("caad")
-    if ds is None :
-        util.initCaadDimensionStyle(config.DRAWINGSCALE)
-    else:
-        ds.ArrowType1 =  System.Enum.Parse(Rhino.DocObjects.DimensionStyle.ArrowType, arrowHead )
-        ds.ArrowType2 =  System.Enum.Parse(Rhino.DocObjects.DimensionStyle.ArrowType, arrowHead )
-        sc.doc.DimStyles.Modify(ds, ds.Index, False)
+    for ds in sc.doc.DimStyles:
+        if ds.Name.startswith('dim') :
+            ds.ArrowType1 =  System.Enum.Parse(Rhino.DocObjects.DimensionStyle.ArrowType, arrowHead )
+            ds.ArrowType2 =  System.Enum.Parse(Rhino.DocObjects.DimensionStyle.ArrowType, arrowHead )
+            sc.doc.DimStyles.Modify(ds, ds.Index, False)
 
 def DimSplit(object_id):
     annotation_object = sc.doc.Objects.Find(object_id )

@@ -24,6 +24,8 @@ class DoubleLine:
         self.line0 = None
         self.line1 = None
         self.width = 0
+        self.parameter0 = []
+        self.parameter1 = []
 
         direction0=rs.VectorUnitize(line0.Direction)
         self.direction = direction0

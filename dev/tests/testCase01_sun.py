@@ -6,22 +6,17 @@ sys.path.insert(0,'..')
 import scriptcontext as sc
 import caad
 from datetime import datetime
-from caad.physics.sunPath import SunPath
-from caad.physics.sunPath import Sun
+import caad.physics.SunPath
+
 reload(caad)
-reload(caad.physics.sunPath)
+reload(caad.physics.SunPath)
+from caad.physics.SunPath import SunPath,Sun
+
 class TestCase01(unittest.TestCase):
     def testSunMethod(self):
-        beijing = SunPath(39.9, 116.3,8)
+        beijingPath = SunPath(39.9, 116.3,8)
         localDatetime = datetime(2019,6,22,12)
-        position =  beijing.getSunPositionByLocaltime( localDatetime )
-        sun = Sun(localDatetime,position['altitude'], position['azimuth'] )
-
-        """
-        myTest = SunPosition()
-        localtime = datetime(2019,6,22,9)
-        position =  myTest.calculateSunPositionWithGMT( localtime,8, 39.9, 116.3 )
-        print position['altitude']*180/math.pi
-        print position['azimuth']*180/math.pi
-        """
+        sun =  beijingPath.calculateSunFromLocalDatetime( localDatetime )
+        print 'altitude2degree:', sun.altitude2deg()
+        print 'azimuth2degree:', sun.azimuth2deg()
 

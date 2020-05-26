@@ -38,6 +38,8 @@ DIMTEXTHEIGHT = 1.5
 
 IMPORTCOMMANDALIAS = False
 import rhinoscriptsyntax as rs
+import scriptcontext as sc
+
 def importCaadAlias():
     #wall
     rs.AddAlias("WW",  "! wall _Enter")

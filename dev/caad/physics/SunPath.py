@@ -3,8 +3,6 @@
 Copyright
 create on 2020.02.28
 @author mahaidong
-
-description:
 '''
 import math
 from datetime import datetime, timedelta
@@ -20,7 +18,7 @@ class SunPath:
 
     def calculateSunFromLocalDatetime( self, theLocalDatetime ):
         utcDatetime = theLocalDatetime - timedelta( hours=self.GMT )
-        return self.__calculateSunPosition( utcDatetime )
+        return self.__calculateSun( utcDatetime )
     
     def __calculateSun(self, theUtcDatetime ):
         localDatetime = theUtcDatetime + timedelta( hours=self.GMT )
@@ -99,7 +97,6 @@ class SunPath:
             # In 4th quadrant
             azimuth += 2 * math.pi
 
-        
         #radian
         return Sun(localDatetime, altitude, azimuth)
 
@@ -126,14 +123,15 @@ class Sun:
         self.sunVector = self._calculateSunVector() 
 
     def _calculateSunVector(self):
-        """
-        sunVector = rs.VectorRotate( (0,1,0), -(azimuth*180/math.pi), (0,0,1) )
-        return rs.VectorRotate( sunVector, altitude*180/math.pi, rs.VectorCrossProduct( sunVector,(0,0,1)) )
-        """
         northVector = Rhino.Geometry.Vector3d(0,1,0)
         zAxis = Rhino.Geometry.Vector3d(0,0,1)
         northVector.Rotate( -self.azimuth, zAxis )
         northVector.Rotate( self.altitude, Rhino.Geometry.Vector3d.CrossProduct(northVector,zAxis) )
         return northVector
+
+    def altitude2deg(self):
+        return self.altitude*180/math.pi
+    def azimuth2deg(self):
+        return self.azimuth*180/math.pi
 
 

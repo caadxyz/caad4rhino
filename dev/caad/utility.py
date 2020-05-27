@@ -133,9 +133,17 @@ def openUrl(url):
         os.system("start \"\" " + url)
 
 
+#################display######################
+def drawArrowLine(line):
+    """
+    parameter: 
+        line:  Rhino.Geometry.Line
+    """
+    # Make a copy of Rhino's default object attributes
+    attribs = sc.doc.CreateDefaultAttributes()
+    # Modify the object decoration style
+    attribs.ObjectDecoration = Rhino.DocObjects.ObjectDecoration.BothArrowhead
+    # Create a new curve object with our attributes
+    sc.doc.Objects.AddLine(line, attribs)
+    sc.doc.Views.Redraw()
 
-"""
-def Local2utc(theLocalTime):
-    aTimeStruct = time.mktime(theLocalTime.timetuple())
-    return datetime.utcfromtimestamp(aTimeStruct)
-"""

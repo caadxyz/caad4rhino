@@ -9,9 +9,11 @@ from datetime import datetime, timedelta
 import time
 import Rhino
 import rhinoscriptsyntax as rs
+import scriptcontext as sc
 
 class SunPath:
     def __init__(self,theLatitude, theLongitude, GMT ):
+        self.basePlane = Rhino.Geometry.Plane( Rhino.Geometry.Point3d.Origin, Rhino.Geometry.Vector3d.ZAxis)
         self.latitude = theLatitude
         self.longitude = theLongitude
         self.GMT = GMT
@@ -19,7 +21,7 @@ class SunPath:
     def calculateSunFromLocalDatetime( self, theLocalDatetime ):
         utcDatetime = theLocalDatetime - timedelta( hours=self.GMT )
         return self.__calculateSun( utcDatetime )
-    
+ 
     def __calculateSun(self, theUtcDatetime ):
         localDatetime = theUtcDatetime + timedelta( hours=self.GMT )
         """
@@ -109,12 +111,151 @@ class SunPath:
         else:
             return angleInRadians
 
-    def calculateSunriseSunset(self, year, month, day):
-        pass
-    
-    def drawSunPath(self):
+    def drawSunPathCurves(self, ):
+        beijingPath = SunPath(39.9, 116.3,8)
+        localDatetime = datetime(2019,6,22,12)
+        sun =  beijingPath.calculateSunFromLocalDatetime( localDatetime )
+        print 'altitude2degree:', sun.altitude2deg()
+        print 'azimuth2degree:', sun.azimuth2deg()
         pass
 
+
+    def drawDailyPathFromLocalDate( self, year, month, day, radius = 200.0 ):
+        theLocalDatetime = datetime(year,month,day)
+    
+        # find the sun position for midnight, noon - 1 hour, noon + 1 hour!
+        hours = [0, 11, 13]
+        sunP = []
+        validCircle =  False
+        for hour in hours:
+            utcDatetime = theLocalDatetime + timedelta( hours = hour) - timedelta( hours=self.GMT )
+            sun = self.__calculateSun(utcDatetime)
+            sunP.append(Rhino.Geometry.Point3d( sun.sunVector*radius ))
+
+        # draw the circle base on these three points
+        circle = Rhino.Geometry.Circle(*sunP)
+        # intersect with the plan
+        intersection = Rhino.Geometry.Intersect.Intersection.PlaneCircle(self.basePlane, circle)
+    
+        #if intersection draw the new curve for intersections and noon
+        if intersection[1] != intersection[2]:
+            startPt = circle.PointAt(intersection[1])
+            endPt = circle.PointAt(intersection[2])
+            midPt = sunP[1]
+            return Rhino.Geometry.Arc(startPt, midPt, endPt)
+        else:
+            # add to check to be above the plane
+            return circle
+    
+
+    def drawYearlyPath(self,radius = 200.0):
+        # draw daily curves for all the months
+        
+        monthlyCrvs = []
+        for m in range(1,13):
+            crv = self.drawDailyPathFromLocalDate( 2000, m, 21 )
+            if crv: monthlyCrvs.append(crv)
+        
+        # draw hourly curves for each of hours for 1st and 21st of all month
+        hourlyCrvs = []
+        days = [1, 7, 14, 21]
+        sunP = []; 
+        selHours = []
+
+        if math.degrees(self.latitude)>0: month = 6
+        else: month = 12
+        
+        # find the hours that the sun is up
+        for hour in range(0,24):
+            theLocalDatetime = datetime(2000,month,21,hour)
+            utcDatetime = theLocalDatetime - timedelta( hours=self.GMT )
+            sun = self.__calculateSun(utcDatetime)
+            if sun.sunVector.Z > self.basePlane.OriginZ: 
+                selHours.append(hour)
+        
+        for hour in selHours:
+            for day in days:
+                sunP = []
+                for m in range(1,13):
+                    theLocalDatetime = datetime( 2000, m, day, hour)
+                    utcDatetime = theLocalDatetime - timedelta( hours=self.GMT )
+                    sun = self.__calculateSun(utcDatetime)
+                    sunP.append(Rhino.Geometry.Point3d( sun.sunVector*radius ))
+            sunP.append(sunP[0])
+            knotStyle = Rhino.Geometry.CurveKnotStyle.UniformPeriodic
+            crv = Rhino.Geometry.Curve.CreateInterpolatedCurve(sunP, 3, knotStyle)
+            intersectionEvents = Rhino.Geometry.Intersect.Intersection.CurvePlane(crv, self.basePlane, sc.doc.ModelAbsoluteTolerance)
+            
+            try:
+                if len(intersectionEvents) != 0:
+                    crvDomain = crv.Domain
+                    crv0 = Rhino.Geometry.Curve.Trim(crv, intersectionEvents[0].ParameterA, intersectionEvents[1].ParameterA)
+                    crv1 = Rhino.Geometry.Curve.Trim(crv, intersectionEvents[1].ParameterA, intersectionEvents[0].ParameterA)
+                    t0 = crv0.Domain.Mid
+                    p0 = crv0.PointAt(t0)
+                    t1 = crv1.Domain.Mid
+                    p1 = crv1.PointAt(t1)
+                    if p0.Z>p1.Z:
+                        crv = crv0
+                    else:
+                        crv = crv1
+            except: pass
+            
+            if crv: 
+                hourlyCrvs.append(crv)
+        return monthlyCrvs, hourlyCrvs
+     
+
+    def drawCompassCurves( self, 
+            cenPt = Rhino.Geometry.Point3d.Origin, 
+            northVector = Rhino.Geometry.Vector3d.YAxis, 
+            radius = 200.0 , centerLine = False):
+
+        baseCircle  = Rhino.Geometry.Circle(cenPt, radius).ToNurbsCurve()
+        outerCircle = Rhino.Geometry.Circle(cenPt, 1.02*radius).ToNurbsCurve()
+        angles = range(0,360,30)
+        xMove = 0.03*radius
+        
+        def drawLine(cenPt, vector, radius, mainLine = False, xMove = 5):
+            stPtRatio = 1
+            endPtRatio = 1.08
+            textPtRatio = endPtRatio + 0.08
+            if mainLine: endPtRatio = 1.15; textPtRatio = 1.17
+            stPt = Rhino.Geometry.Point3d.Add(cenPt, stPtRatio * radius * vector)
+            if centerLine: stPt = cenPt
+            endPt = Rhino.Geometry.Point3d.Add(cenPt, endPtRatio * radius * vector)
+            textBasePt = Rhino.Geometry.Point3d.Add(cenPt, textPtRatio * radius * vector)
+            
+            if not mainLine: textBasePt = Rhino.Geometry.Point3d(textBasePt.X-xMove, textBasePt.Y-(xMove/4), textBasePt.Z)
+            else: textBasePt = Rhino.Geometry.Point3d(textBasePt.X-(xMove/2), textBasePt.Y-(xMove/2), textBasePt.Z)
+            return Rhino.Geometry.Line(stPt, endPt).ToNurbsCurve(), textBasePt, baseCircle, outerCircle
+        
+        lines = []; textBasePts = []
+        mainAngles = [0, 90, 180, 270]
+        mainText = ['N', 'E', 'S', 'W']
+        compassText = []
+        for angle in angles:
+            mainLine = False
+            if angle in mainAngles: mainLine = True
+            vector = Rhino.Geometry.Vector3d(northVector)
+            vector.Rotate(-math.radians(angle), Rhino.Geometry.Vector3d.ZAxis)
+            line, basePt, baseCircle, outerCircle = drawLine(cenPt, vector, radius, mainLine, xMove)
+            if len(angles) != 8 and len(angles) != 16:
+                if mainLine == True: compassText.append(mainText[mainAngles.index(angle)])
+                else: compassText.append(str(int(angle)))
+            
+            textBasePts.append(basePt)
+            lines.append(line)
+        
+        lines.append(baseCircle)
+        lines.append(outerCircle)
+
+        # lines, textBasePts, compassText
+        for line in lines:
+            sc.doc.Objects.AddCurve(line)
+
+
+   
 class Sun:
     def __init__(self, datetime, altitude, azimuth ):
         self.datetime = datetime

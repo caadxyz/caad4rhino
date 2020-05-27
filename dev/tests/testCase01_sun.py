@@ -15,8 +15,8 @@ from caad.physics.SunPath import SunPath,Sun
 class TestCase01(unittest.TestCase):
     def testSunMethod(self):
         beijingPath = SunPath(39.9, 116.3,8)
-        localDatetime = datetime(2019,6,22,12)
-        sun =  beijingPath.calculateSunFromLocalDatetime( localDatetime )
-        print 'altitude2degree:', sun.altitude2deg()
-        print 'azimuth2degree:', sun.azimuth2deg()
+        # localDatetime = datetime(2019,6,22,12)
+        # sun =  beijingPath.calculateSunFromLocalDatetime( localDatetime )
+        beijingPath.drawCompassCurves()
+
 

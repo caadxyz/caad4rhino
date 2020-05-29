@@ -10,3 +10,4 @@ dev/rhinoTest.py
 resource/**.3dm.rhl
 /.vscode
 **/*.orig
+**/*.pyc

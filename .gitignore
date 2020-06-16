@@ -11,3 +11,4 @@ resource/**.3dm.rhl
 /.vscode
 **/*.orig
 **/*.pyc
+/grasshopper/*.gh

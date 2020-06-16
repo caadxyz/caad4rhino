@@ -17,6 +17,6 @@ class TestCase01(unittest.TestCase):
         beijingPath = SunPath(39.9, 116.3,8)
         # localDatetime = datetime(2019,6,22,12)
         # sun =  beijingPath.calculateSunFromLocalDatetime( localDatetime )
-        beijingPath.drawCompassCurves()
+        beijingPath.draw()
 
 

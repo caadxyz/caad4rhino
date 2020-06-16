@@ -8,12 +8,10 @@ from SimpleXMLRPCServer import SimpleXMLRPCServer
 address = ('localhost', 50000)
 server = SimpleXMLRPCServer(address)
 
-
 def multiply(a, b):
     """return the product of two numbers"""
     return a * b
 server.register_function(multiply)
-
 
 if __name__ == '__main__':
     try:

@@ -111,16 +111,7 @@ class SunPath:
         else:
             return angleInRadians
 
-    def drawSunPathCurves(self, ):
-        beijingPath = SunPath(39.9, 116.3,8)
-        localDatetime = datetime(2019,6,22,12)
-        sun =  beijingPath.calculateSunFromLocalDatetime( localDatetime )
-        print 'altitude2degree:', sun.altitude2deg()
-        print 'azimuth2degree:', sun.azimuth2deg()
-        pass
-
-
-    def drawDailyPathFromLocalDate( self, year, month, day, radius = 200.0 ):
+    def dailyPathFromLocalDate( self, year, month, day, radius = 200.0 ):
         theLocalDatetime = datetime(year,month,day)
     
         # find the sun position for midnight, noon - 1 hour, noon + 1 hour!
@@ -148,12 +139,11 @@ class SunPath:
             return circle
     
 
-    def drawYearlyPath(self,radius = 200.0):
+    def yearlyPath(self,radius = 200.0):
         # draw daily curves for all the months
-        
         monthlyCrvs = []
         for m in range(1,13):
-            crv = self.drawDailyPathFromLocalDate( 2000, m, 21 )
+            crv = self.dailyPathFromLocalDate( 2000, m, 21 )
             if crv: monthlyCrvs.append(crv)
         
         # draw hourly curves for each of hours for 1st and 21st of all month
@@ -184,7 +174,8 @@ class SunPath:
             sunP.append(sunP[0])
             knotStyle = Rhino.Geometry.CurveKnotStyle.UniformPeriodic
             crv = Rhino.Geometry.Curve.CreateInterpolatedCurve(sunP, 3, knotStyle)
-            intersectionEvents = Rhino.Geometry.Intersect.Intersection.CurvePlane(crv, self.basePlane, sc.doc.ModelAbsoluteTolerance)
+            intersectionEvents = Rhino.Geometry.Intersect.Intersection.CurvePlane(crv, 
+                                                            self.basePlane, sc.doc.ModelAbsoluteTolerance)
             
             try:
                 if len(intersectionEvents) != 0:
@@ -206,10 +197,7 @@ class SunPath:
         return monthlyCrvs, hourlyCrvs
      
 
-    def drawCompassCurves( self, 
-            cenPt = Rhino.Geometry.Point3d.Origin, 
-            northVector = Rhino.Geometry.Vector3d.YAxis, 
-            radius = 200.0 , centerLine = False):
+    def compassCurves( self, cenPt, northVector, radius, centerLine ):
 
         baseCircle  = Rhino.Geometry.Circle(cenPt, radius).ToNurbsCurve()
         outerCircle = Rhino.Geometry.Circle(cenPt, 1.02*radius).ToNurbsCurve()
@@ -243,19 +231,43 @@ class SunPath:
             if len(angles) != 8 and len(angles) != 16:
                 if mainLine == True: compassText.append(mainText[mainAngles.index(angle)])
                 else: compassText.append(str(int(angle)))
-            
             textBasePts.append(basePt)
             lines.append(line)
         
         lines.append(baseCircle)
         lines.append(outerCircle)
 
-        # lines, textBasePts, compassText
-        for line in lines:
+        return lines, textBasePts, compassText
+
+    def draw(self, cenPt = Rhino.Geometry.Point3d.Origin, 
+            northVector = Rhino.Geometry.Vector3d.YAxis, 
+            radius = 200.0 , centerLine = False):
+
+        # draw compass
+        compassLines, compassTextPts, compassText = self.compassCurves(cenPt,northVector,radius,centerLine)
+        for line in compassLines:
             sc.doc.Objects.AddCurve(line)
 
+        for i in range( len(compassTextPts) ):
+            text_entity = Rhino.Geometry.TextEntity()
+            text_entity.Plane = Rhino.Geometry.Plane( compassTextPts[i],Rhino.Geometry.Vector3d(0,0,1))
+            text_entity.Text = compassText[i]
+            text_entity.TextHeight = 8
+            text_entity.Justification = Rhino.Geometry.TextJustification.BottomLeft
+            text_entity.FontIndex = sc.doc.Fonts.FindOrCreate("Arial", False, False)
+            sc.doc.Objects.AddText(text_entity)
 
-   
+        # draw year path
+        monthlyCrvs, hourlyCrvs = self.yearlyPath(radius)
+        for arc in monthlyCrvs:
+            if isinstance(arc, Rhino.Geometry.Arc):
+                sc.doc.Objects.AddArc(arc)
+            else: 
+                sc.doc.Objects.AddCircle(arc)
+        for crv in hourlyCrvs:
+            sc.doc.Objects.AddCurve(crv)
+
+
 class Sun:
     def __init__(self, datetime, altitude, azimuth ):
         self.datetime = datetime

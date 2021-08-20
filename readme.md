@@ -29,10 +29,7 @@ Caad4Rhino is a python package whose purpose is to provide computer aided archit
 ### How to install?
 
 * create a folder in   
-**mac**:   
-`~/Library/Application Support/McNeel/Rhinoceros/6.0/Plug-ins/PythonPlugIns/caad4rhino{417c9034-2152-48dc-b487-29b584c473a5}`  
-
-**win**:   
+**mac**: `~/Library/Application Support/McNeel/Rhinoceros/6.0/Plug-ins/PythonPlugIns/caad4rhino{417c9034-2152-48dc-b487-29b584c473a5}`  or **win**:   
 `%APPDATA%\McNeel\Rhinoceros\6.0\Plug-ins\PythonPlugIns/caad4rhino{417c9034-2152-48dc-b487-29b584c473a5}`
 * copy `dev` folder to `caad4rhino{417c9034-2152-48dc-b487-29b584c473a5}`
 * open Rhino software then type command `caad` for help
